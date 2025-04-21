@@ -42,7 +42,7 @@ public class TuitionServiceImpl extends CRUDImpl<Tuition, String> implements ITu
 
         Mono<List<Course>> coursesFound = Flux.fromIterable(tuitionDTO.getCoursesName())
                 .flatMap(name ->
-                        courseRepository.findCourseByName(name)
+                        courseRepository.findCourseByNameAndStatusIsTrue(name)
                                 .switchIfEmpty(Mono.error(new RuntimeException("Curso no encontrado: " + name)))
                 )
                 .collectList();

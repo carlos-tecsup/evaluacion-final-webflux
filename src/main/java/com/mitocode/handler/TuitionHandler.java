@@ -4,6 +4,7 @@ import com.mitocode.dto.TuitionDTO;
 import com.mitocode.dto.TuitionResponse;
 import com.mitocode.model.Tuition;
 import com.mitocode.service.ITuitionService;
+import com.mitocode.validator.RequestValidator;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -23,11 +24,13 @@ public class TuitionHandler {
 
     @Qualifier("tuitionMapper")
     private final ModelMapper modelMapper;
+    private final RequestValidator requestValidator;
 
     public Mono<ServerResponse> save(ServerRequest request) {
         Mono<TuitionDTO> monoTuitionDTO = request.bodyToMono(TuitionDTO.class);
 
         return monoTuitionDTO
+                .flatMap(requestValidator::validate)
                 .flatMap(tuitionService::registerTuition)
                 .map(this::convertToDto)
                 .flatMap(response -> ServerResponse

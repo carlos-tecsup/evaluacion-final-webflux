@@ -68,7 +68,7 @@ public class CourseController {
 
     @DeleteMapping("/{id}")
     public Mono<ResponseEntity<Void>> delete(@PathVariable("id") String id){
-        return courseService.delete(id)
+        return courseService.deleteCourse(id)
                 .flatMap(result->{
                     if(result){
                         return Mono.just(ResponseEntity.noContent().build());

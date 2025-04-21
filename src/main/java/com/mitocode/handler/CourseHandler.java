@@ -73,7 +73,7 @@ public class CourseHandler {
     public Mono<ServerResponse> delete(ServerRequest request) {
         String id = request.pathVariable("id");
 
-        return courseService.delete(id)
+        return courseService.deleteCourse(id)
                 .flatMap(result -> {
                     if(result){
                         return ServerResponse.noContent().build();

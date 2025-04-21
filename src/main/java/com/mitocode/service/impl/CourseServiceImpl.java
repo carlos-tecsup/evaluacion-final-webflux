@@ -29,4 +29,18 @@ public class CourseServiceImpl extends CRUDImpl<Course, String> implements ICour
                 .then(courseRepository.save(course));
     }
 
+
+    @Override
+    public Mono<Boolean> deleteCourse(String id) {
+        return courseRepository.findById(id)
+                .switchIfEmpty(Mono.error(new RuntimeException("Curso no encontrado")))
+                .flatMap(course -> {
+                    course.setStatus(false);
+                    return courseRepository.save(course);
+                })
+                .map(course -> true)
+                .onErrorReturn(false);
+    }
+
+
 }
