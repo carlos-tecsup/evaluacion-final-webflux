@@ -27,7 +27,6 @@ public class CourseServiceImpl extends CRUDImpl<Course, String> implements ICour
                 .doOnNext(course::setId)
                 .doOnNext(id -> course.setStatus(true))
                 .then(courseRepository.save(course));
-
     }
 
 }
