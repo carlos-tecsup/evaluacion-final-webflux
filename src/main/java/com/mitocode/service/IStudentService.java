@@ -1,9 +1,8 @@
 package com.mitocode.service;
 
 import com.mitocode.model.Student;
-import com.mitocode.model.User;
-import org.springframework.data.mongodb.repository.MongoRepository;
-import org.springframework.data.mongodb.repository.ReactiveMongoRepository;
+import reactor.core.publisher.Flux;
 
-public interface IStudentService extends ICRUD<Student, Long> {
+public interface IStudentService extends ICRUD<Student, String> {
+    Flux<Student> findAllSortedByAge(String direction);
 }

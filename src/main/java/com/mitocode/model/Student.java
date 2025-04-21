@@ -15,7 +15,7 @@ import org.springframework.data.mongodb.core.mapping.Field;
 @Document(collection = "students")
 public class Student {
     @Id
-    private Long id;
+    private String id;
     @Field
     private String name;
     @Field

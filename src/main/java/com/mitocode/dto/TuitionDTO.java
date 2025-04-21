@@ -2,34 +2,22 @@ package com.mitocode.dto;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import jakarta.validation.constraints.NotNull;
-import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+
+import java.time.LocalDateTime;
+import java.util.List;
 
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
 @JsonInclude(JsonInclude.Include.NON_NULL)
-public class StudentDTO {
-
-    private String id;
+public class TuitionDTO {
 
     @NotNull
-    @Size(min = 2, max = 20)
-    private String name;
-
+    private String dniStudent;
     @NotNull
-    @Size(min = 2, max = 20)
-    private String lastName;
-
-    @NotNull
-    @Size(min = 8, max = 8)
-    private String dni;
-
-    @NotNull
-    private int age;
-
-
+    private List<String> coursesName;
 
 }

@@ -8,7 +8,6 @@ import reactor.core.publisher.Mono;
 public abstract class CRUDImpl<T, ID> implements ICRUD<T, ID> {
 
     protected abstract IGenericRepository<T, ID> getRepo();
-
     @Override
     public Mono<T> save(T t) {
         return getRepo().save(t);
@@ -41,5 +40,7 @@ public abstract class CRUDImpl<T, ID> implements ICRUD<T, ID> {
                     }
                 });
     }
+
+
 
 }
