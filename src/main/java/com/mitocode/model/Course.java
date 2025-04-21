@@ -19,10 +19,8 @@ public class Course {
     @Id
     private String id;
     @Field
-    @Indexed(unique = true)
     private String name;
     @Field
-    @Indexed(unique = true)
     private String acronym;
     @Field
     private boolean status;

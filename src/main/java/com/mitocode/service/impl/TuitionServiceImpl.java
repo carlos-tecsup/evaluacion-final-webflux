@@ -36,33 +36,42 @@ public class TuitionServiceImpl extends CRUDImpl<Tuition, String> implements ITu
 
     @Override
     public Mono<Tuition> registerTuition(TuitionDTO tuitionDTO) {
-        Mono<Student> studentFound = studentRepository.findStudentByDni(tuitionDTO.getDniStudent())
-                .switchIfEmpty(Mono.error(new RuntimeException("Estudiante no encontrado")));
-
-
-        Mono<List<Course>> coursesFound = Flux.fromIterable(tuitionDTO.getCoursesName())
-                .flatMap(name ->
-                        courseRepository.findCourseByNameAndStatusIsTrue(name)
-                                .switchIfEmpty(Mono.error(new RuntimeException("Curso no encontrado: " + name)))
+        // Paso 1: Validar si el estudiante ya está matriculado
+        return tuitionRepository.existsTuitionByStudentDni(tuitionDTO.getDniStudent())
+                .flatMap(isEnrolled -> {
+                    if (isEnrolled) {
+                        return Mono.error(new RuntimeException("El estudiante ya está matriculado."));
+                    }
+                    return Mono.empty();
+                })
+                // Paso 2: Validar si el estudiante existe y los cursos son válidos
+                .then(
+                        studentRepository.findStudentByDni(tuitionDTO.getDniStudent())
+                                .switchIfEmpty(Mono.error(new RuntimeException("Estudiante no encontrado")))
+                                .zipWith(
+                                        Flux.fromIterable(tuitionDTO.getCoursesName())
+                                                .flatMap(name ->
+                                                        courseRepository.findCourseByNameAndStatusIsTrue(name)
+                                                                .switchIfEmpty(Mono.error(new RuntimeException("Curso no encontrado: " + name)))
+                                                )
+                                                .collectList()
+                                )
                 )
-                .collectList();
-
-        return Mono.zip(studentFound, coursesFound)
+                // Paso 3: Crear la matrícula
                 .flatMap(tuple -> {
-                    Student studentTuition = tuple.getT1();
-                    List<Course> coursesTuition = tuple.getT2();
+                    Student student = tuple.getT1();
+                    List<Course> courses = tuple.getT2();
+
                     return sequenceGeneratorService.generateSequence("tuition_sequence")
                             .flatMap(tuitionId -> {
-                                // Crear la entidad de Tuition
                                 Tuition tuition = Tuition.builder()
-                                        .id(tuitionId)  // Asignar el tuitionId generado
-                                        .student(studentTuition)
-                                        .courses(coursesTuition)
+                                        .id(tuitionId)
+                                        .student(student)
+                                        .courses(courses)
                                         .registrationDate(LocalDateTime.now())
                                         .status(true)
                                         .build();
 
-                                // Guardar la matrícula en la base de datos
                                 return tuitionRepository.save(tuition);
                             });
                 });
