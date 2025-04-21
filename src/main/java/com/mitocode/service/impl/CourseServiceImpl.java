@@ -9,8 +9,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Mono;
 
-import java.util.Objects;
-
 @Service
 @RequiredArgsConstructor
 public class CourseServiceImpl extends CRUDImpl<Course, String> implements ICourseService {
@@ -27,7 +25,9 @@ public class CourseServiceImpl extends CRUDImpl<Course, String> implements ICour
     public Mono<Course> save(Course course) {
         return sequenceGeneratorService.generateSequence("course_sequence")
                 .doOnNext(course::setId)
+                .doOnNext(id -> course.setStatus(true))
                 .then(courseRepository.save(course));
+
     }
 
 }

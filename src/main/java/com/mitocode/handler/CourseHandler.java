@@ -4,6 +4,7 @@ import com.mitocode.dto.CourseDTO;
 import com.mitocode.dto.CourseDTO;
 import com.mitocode.model.Course;
 import com.mitocode.service.ICourseService;
+import com.mitocode.validator.RequestValidator;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -26,10 +27,13 @@ public class CourseHandler {
     @Qualifier("defaultMapper")
     private final ModelMapper modelMapper;
 
+    private final RequestValidator requestValidator;
+
     public Mono<ServerResponse> save(ServerRequest request) {
         Mono<CourseDTO> monoCourseDTO = request.bodyToMono(CourseDTO.class);
 
         return monoCourseDTO
+                .flatMap(requestValidator::validate)
                 .flatMap(e -> courseService.save(convertToDocument(e)))
                 .map(this::convertToDto)
                 .flatMap(e -> ServerResponse
@@ -52,6 +56,7 @@ public class CourseHandler {
         Mono<CourseDTO> monoCourseDTO = request.bodyToMono(CourseDTO.class);
 
         return monoCourseDTO
+                .flatMap(requestValidator::validate)
                 .map(e -> {
                     e.setId(id);
                     return e;
